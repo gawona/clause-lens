@@ -117,4 +117,12 @@ public class Document {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void startExtracting() {
+        this.analysisStatus = AnalysisStatus.EXTRACTING;
+    }
+
+    public void completeAnalysis() {
+        this.analysisStatus = AnalysisStatus.COMPLETED;
+    }
 }

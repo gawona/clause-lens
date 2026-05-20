@@ -1,5 +1,6 @@
 package com.clauselens.backend.document.controller;
 
+import com.clauselens.backend.analysis.service.DocumentAnalysisService;
 import com.clauselens.backend.document.domain.DocumentType;
 import com.clauselens.backend.document.dto.DocumentResponse;
 import com.clauselens.backend.document.service.DocumentService;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final DocumentAnalysisService documentAnalysisService;
 
     @Operation(summary = "PDF 문서 업로드", description = "PDF 파일과 문서 메타데이터를 업로드합니다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -47,11 +49,11 @@ public class DocumentController {
         return documentService.getDocument(documentId);
     }
 
-    @Operation(summary = "문서 분석 요청", description = "문서 분석 상태를 REQUESTED로 변경합니다.")
+    @Operation(summary = "문서 분석 요청", description = "FastAPI 분석엔진을 호출하여 PDF 텍스트를 추출하고 페이지별 텍스트를 저장합니다.")
     @PostMapping("/{documentId}/analysis")
     public DocumentResponse requestAnalysis(
             @PathVariable UUID documentId
     ) {
-        return documentService.requestAnalysis(documentId);
+        return documentAnalysisService.analyzeDocument(documentId);
     }
 }

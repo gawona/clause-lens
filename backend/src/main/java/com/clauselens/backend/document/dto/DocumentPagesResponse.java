@@ -1,18 +1,11 @@
 package com.clauselens.backend.document.dto;
 
-import com.clauselens.backend.document.domain.DocumentPage;
+import java.util.List;
+import java.util.UUID;
 
-public record DocumentPageResponse(
-        Long id,
-        Integer page,
-        String text
+public record DocumentPagesResponse(
+        UUID documentId,
+        int pageCount,
+        List<DocumentPageResponse> pages
 ) {
-
-    public static DocumentPageResponse from(DocumentPage documentPage) {
-        return new DocumentPageResponse(
-                documentPage.getId(),
-                documentPage.getPageNumber(),
-                documentPage.getContent()
-        );
-    }
 }
