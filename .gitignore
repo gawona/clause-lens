@@ -1,0 +1,29 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Java / Gradle
+backend/build/
+backend/.gradle/
+backend/out/
+
+# Python
+analysis-engine/.venv/
+analysis-engine/__pycache__/
+analysis-engine/**/*.pyc
+
+# IDE
+.idea/
+.vscode/
+
+# Docker volumes / logs
+*.log
