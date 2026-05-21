@@ -23,43 +23,37 @@ public class DocumentSearchService {
     private final OpenSearchProperties openSearchProperties;
     private final ObjectMapper objectMapper;
 
-    public DocumentSearchResponse search(UUID documentId, String query) {
+    public DocumentSearchResponse search(UUID documentId, String query, int size) {
         String indexName = openSearchProperties.getIndex().getDocumentChunks();
 
         String requestBody = """
-                {
-                  "size": 10,
-                  "query": {
-                    "bool": {
-                      "filter": [
-                        {
-                          "term": {
-                            "documentId": "%s"
-                          }
-                        }
-                      ],
-                      "must": [
-                        {
-                          "multi_match": {
-                            "query": "%s",
-                            "fields": [
-                              "content^3",
-                              "sectionTitle^2",
-                              "chunkType"
-                            ]
-                          }
-                        }
-                      ]
+            {
+              "size": %d,
+              "query": {
+                "bool": {
+                  "filter": [
+                    {
+                      "term": {
+                        "documentId": "%s"
+                      }
                     }
-                  },
-                  "highlight": {
-                    "fields": {
-                      "content": {},
-                      "sectionTitle": {}
+                  ],
+                  "must": [
+                    {
+                      "multi_match": {
+                        "query": "%s",
+                        "fields": [
+                          "content^3",
+                          "sectionTitle^2",
+                          "chunkType"
+                        ]
+                      }
                     }
-                  }
+                  ]
                 }
-                """.formatted(documentId, escapeJson(query));
+              }
+            }
+            """.formatted(size, documentId, escapeJson(query));
 
         String responseBody = openSearchRestClient.post()
                 .uri("/{indexName}/_search", indexName)
@@ -71,6 +65,10 @@ public class DocumentSearchService {
         JsonNode response = parseJson(responseBody);
 
         return new DocumentSearchResponse(query, parseResults(response));
+    }
+
+    public DocumentSearchResponse search(UUID documentId, String query) {
+        return search(documentId, query, 10);
     }
 
     private List<DocumentSearchResult> parseResults(JsonNode response) {

@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 @EnableConfigurationProperties(OpenSearchProperties.class)
 public class OpenSearchConfig {
 
-    @Bean
+    @Bean(name = "openSearchRestClient")
     public RestClient openSearchRestClient(OpenSearchProperties properties) {
         return RestClient.builder()
                 .baseUrl(properties.getUrl())
