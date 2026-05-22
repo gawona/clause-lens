@@ -99,9 +99,16 @@ public class DocumentSearchService {
     }
 
     private String escapeJson(String value) {
+        if (value == null) {
+            return "";
+        }
+
         return value
                 .replace("\\", "\\\\")
-                .replace("\"", "\\\"");
+                .replace("\"", "\\\"")
+                .replace("\r", "\\r")
+                .replace("\n", "\\n")
+                .replace("\t", "\\t");
     }
 
     private JsonNode parseJson(String responseBody) {

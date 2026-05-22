@@ -11,4 +11,6 @@ public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, Lo
     List<DocumentChunk> findByDocumentOrderByChunkOrderAsc(Document document);
 
     void deleteByDocument(Document document);
+
+    List<DocumentChunk> findTop5ByDocumentOrderByPageNumberAscChunkOrderAsc(Document document);
 }

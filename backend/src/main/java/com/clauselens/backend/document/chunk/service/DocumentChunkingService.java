@@ -40,6 +40,7 @@ public class DocumentChunkingService {
         }
 
         documentChunkRepository.deleteByDocument(document);
+        documentChunkRepository.flush();
 
         List<DocumentChunk> chunks = new ArrayList<>();
         int chunkOrder = 1;

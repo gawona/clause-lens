@@ -66,4 +66,30 @@ public class OpenAiChatClient {
             throw new IllegalStateException("OpenAI 응답 body 읽기 실패", e);
         }
     }
+
+    public String generateJson(String systemPrompt, String userPrompt) {
+        OpenAiChatRequest request = new OpenAiChatRequest(
+                openAiProperties.getModel(),
+                List.of(
+                        new OpenAiMessage("system", systemPrompt),
+                        new OpenAiMessage("user", userPrompt)
+                ),
+                0.0
+        );
+
+        return openAiRestClient.post()
+                .uri("/chat/completions")
+                .body(request)
+                .exchange((clientRequest, clientResponse) -> {
+                    String responseBody = readBody(clientResponse.getBody());
+                    HttpStatusCode statusCode = clientResponse.getStatusCode();
+
+                    if (!statusCode.is2xxSuccessful()) {
+                        throw new IllegalStateException("OpenAI API 호출 실패: " + responseBody);
+                    }
+
+                    OpenAiChatResponse response = objectMapper.readValue(responseBody, OpenAiChatResponse.class);
+                    return response.firstContent();
+                });
+    }
 }
