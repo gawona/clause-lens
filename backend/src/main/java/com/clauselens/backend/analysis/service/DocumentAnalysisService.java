@@ -52,9 +52,8 @@ public class DocumentAnalysisService {
                 documentPageRepository.save(documentPage);
             }
 
-            document.completeAnalysis();
-
             return DocumentResponse.from(document);
+
         } catch (Exception e) {
             document.failAnalysis();
             throw new IllegalStateException("문서 분석 중 오류가 발생했습니다. 원인: " + e.getMessage(), e);

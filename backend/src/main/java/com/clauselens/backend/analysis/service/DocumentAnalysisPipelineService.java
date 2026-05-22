@@ -2,6 +2,8 @@ package com.clauselens.backend.analysis.service;
 
 import com.clauselens.backend.analysis.dto.DocumentAnalysisRunResponse;
 import com.clauselens.backend.document.chunk.service.DocumentChunkingService;
+import com.clauselens.backend.document.domain.Document;
+import com.clauselens.backend.document.service.DocumentStatusService;
 import com.clauselens.backend.extraction.dto.ContractExtractionResponse;
 import com.clauselens.backend.extraction.service.DocumentExtractionService;
 import com.clauselens.backend.search.service.DocumentIndexService;
@@ -18,20 +20,30 @@ public class DocumentAnalysisPipelineService {
     private final DocumentChunkingService documentChunkingService;
     private final DocumentIndexService documentIndexService;
     private final DocumentExtractionService documentExtractionService;
+    private final DocumentStatusService documentStatusService;
 
     public DocumentAnalysisRunResponse runAnalysis(UUID documentId) {
-        documentAnalysisService.analyzeDocument(documentId);
+        try {
+            documentAnalysisService.analyzeDocument(documentId);
 
-        documentChunkingService.chunkDocument(documentId);
+            documentStatusService.updateStatus(documentId, Document::startChunking);
+            documentChunkingService.chunkDocument(documentId);
 
-        documentIndexService.indexDocumentChunks(documentId);
+            documentStatusService.updateStatus(documentId, Document::startIndexing);
+            documentIndexService.indexDocumentChunks(documentId);
 
-        ContractExtractionResponse extraction = documentExtractionService.extractContractFields(documentId);
+            ContractExtractionResponse extraction = documentExtractionService.extractContractFields(documentId);
 
-        return new DocumentAnalysisRunResponse(
-                documentId,
-                "문서 분석이 완료되었습니다.",
-                extraction
-        );
+            documentStatusService.updateStatus(documentId, Document::completeAnalysis);
+
+            return new DocumentAnalysisRunResponse(
+                    documentId,
+                    "문서 분석이 완료되었습니다.",
+                    extraction
+            );
+        } catch (Exception e) {
+            documentStatusService.updateStatus(documentId, Document::failAnalysis);
+            throw e;
+        }
     }
 }

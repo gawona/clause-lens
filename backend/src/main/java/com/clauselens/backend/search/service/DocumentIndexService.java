@@ -49,6 +49,8 @@ public class DocumentIndexService {
                 .body(bulkBody.getBytes(StandardCharsets.UTF_8))
                 .retrieve()
                 .toBodilessEntity();
+
+        refreshDocumentChunksIndex();
     }
 
     private void createIndexIfNotExists() {
@@ -148,5 +150,14 @@ public class DocumentIndexService {
     }
 
     private record BulkIndexInfo(String _index, String _id) {
+    }
+
+    private void refreshDocumentChunksIndex() {
+        String indexName = openSearchProperties.getIndex().getDocumentChunks();
+
+        openSearchRestClient.post()
+                .uri("/{indexName}/_refresh", indexName)
+                .retrieve()
+                .toBodilessEntity();
     }
 }

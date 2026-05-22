@@ -125,4 +125,12 @@ public class Document {
     public void completeAnalysis() {
         this.analysisStatus = AnalysisStatus.COMPLETED;
     }
+
+    public void startChunking() {
+        this.analysisStatus = AnalysisStatus.CHUNKING;
+    }
+
+    public void startIndexing() {
+        this.analysisStatus = AnalysisStatus.INDEXING;
+    }
 }
