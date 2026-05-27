@@ -6,6 +6,8 @@ import com.clauselens.backend.document.domain.Document;
 import com.clauselens.backend.document.service.DocumentStatusService;
 import com.clauselens.backend.extraction.dto.ContractExtractionResponse;
 import com.clauselens.backend.extraction.service.DocumentExtractionService;
+import com.clauselens.backend.risk.dto.RiskDetectionResponse;
+import com.clauselens.backend.risk.service.DocumentRiskService;
 import com.clauselens.backend.search.service.DocumentIndexService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class DocumentAnalysisPipelineService {
     private final DocumentChunkingService documentChunkingService;
     private final DocumentIndexService documentIndexService;
     private final DocumentExtractionService documentExtractionService;
+    private final DocumentRiskService documentRiskService;
     private final DocumentStatusService documentStatusService;
 
     public DocumentAnalysisRunResponse runAnalysis(UUID documentId) {
@@ -32,14 +35,19 @@ public class DocumentAnalysisPipelineService {
             documentStatusService.updateStatus(documentId, Document::startIndexing);
             documentIndexService.indexDocumentChunks(documentId);
 
-            ContractExtractionResponse extraction = documentExtractionService.extractContractFields(documentId);
+            ContractExtractionResponse extraction =
+                    documentExtractionService.extractContractFields(documentId);
+
+            RiskDetectionResponse risks =
+                    documentRiskService.detectRisks(documentId);
 
             documentStatusService.updateStatus(documentId, Document::completeAnalysis);
 
             return new DocumentAnalysisRunResponse(
                     documentId,
                     "문서 분석이 완료되었습니다.",
-                    extraction
+                    extraction,
+                    risks
             );
         } catch (Exception e) {
             documentStatusService.updateStatus(documentId, Document::failAnalysis);
