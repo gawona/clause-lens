@@ -298,20 +298,29 @@ public class DocumentExtractionService {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("문서를 찾을 수 없습니다. documentId=" + documentId));
 
-        DocumentExtractionResult result = documentExtractionResultRepository.findByDocument(document)
-                .orElseThrow(() -> new IllegalStateException("저장된 핵심 항목 추출 결과가 없습니다. documentId=" + documentId));
-
-        return new ContractExtractionResponse(
-                result.getContractTitle(),
-                readList(result.getPartiesJson(), String.class),
-                result.getContractAmount(),
-                result.getContractPeriod(),
-                result.getDeliveryDeadline(),
-                result.getPaymentTerms(),
-                result.getPenaltyClause(),
-                result.getTerminationClause(),
-                readEvidenceList(result.getEvidenceJson())
-        );
+        return documentExtractionResultRepository.findByDocument(document)
+                .map(result -> new ContractExtractionResponse(
+                        result.getContractTitle(),
+                        readList(result.getPartiesJson(), String.class),
+                        result.getContractAmount(),
+                        result.getContractPeriod(),
+                        result.getDeliveryDeadline(),
+                        result.getPaymentTerms(),
+                        result.getPenaltyClause(),
+                        result.getTerminationClause(),
+                        readEvidenceList(result.getEvidenceJson())
+                ))
+                .orElseGet(() -> new ContractExtractionResponse(
+                        null,
+                        List.of(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        List.of()
+                ));
     }
 
     private <T> List<T> readList(String json, Class<T> elementType) {

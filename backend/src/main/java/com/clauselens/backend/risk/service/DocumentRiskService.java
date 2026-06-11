@@ -74,13 +74,15 @@ public class DocumentRiskService {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("문서를 찾을 수 없습니다. documentId=" + documentId));
 
-        DocumentRiskResult result = documentRiskResultRepository.findByDocument(document)
-                .orElseThrow(() -> new IllegalStateException("저장된 위험 조항 탐지 결과가 없습니다. documentId=" + documentId));
-
-        return new RiskDetectionResponse(
-                documentId,
-                readRiskList(result.getRisksJson())
-        );
+        return documentRiskResultRepository.findByDocument(document)
+                .map(result -> new RiskDetectionResponse(
+                        documentId,
+                        readRiskList(result.getRisksJson())
+                ))
+                .orElseGet(() -> new RiskDetectionResponse(
+                        documentId,
+                        List.of()
+                ));
     }
 
     private void saveRiskResult(Document document, RiskDetectionResponse response) {
