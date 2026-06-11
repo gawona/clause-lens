@@ -55,11 +55,9 @@ const RiskClauseList = ({ risks }: RiskClauseListProps) => {
 
               {risk.evidence && (
                 <div className="mt-4 rounded-lg bg-gray-50 p-3">
-                  <p className="text-xs font-medium text-gray-500">
-                    근거 페이지: {risk.evidence.page || "-"}
-                    {risk.evidence.section
-                      ? ` · ${risk.evidence.section}`
-                      : ""}
+                  <p className="text-xs font-medium text-slate-500">
+                    근거 페이지: {risk.evidence.pageNumber ? `${risk.evidence.pageNumber}p` : "-"}
+                    {risk.evidence.sectionTitle ? ` · ${risk.evidence.sectionTitle}` : ""}
                   </p>
 
                   <p className="mt-2 text-sm leading-6 text-gray-700">

@@ -30,23 +30,31 @@ export interface DocumentItem {
 
 export interface DocumentDetail extends DocumentItem {}
 
+export interface ExtractionEvidence {
+  chunkId: number;
+  pageNumber: number;
+  sectionTitle: string | null;
+  text: string;
+  score: number;
+}
+
 export interface ContractExtraction {
-  contractTitle?: string | null;
-  parties?: string | null;
-  contractAmount?: string | number | null;
-  startDate?: string | null;
-  endDate?: string | null;
-  paymentTerms?: string | null;
-  penaltyClause?: string | null;
-  terminationClause?: string | null;
-  [key: string]: unknown;
+  contractTitle: string | null;
+  parties: string[];
+  contractAmount: string | null;
+  contractPeriod: string | null;
+  deliveryDeadline: string | null;
+  paymentTerms: string | null;
+  penaltyClause: string | null;
+  terminationClause: string | null;
+  evidence: ExtractionEvidence[];
 }
 
 export type RiskLevel = "LOW" | "MEDIUM" | "HIGH";
 
 export interface RiskEvidence {
-  page?: number | null;
-  section?: string | null;
+  pageNumber?: number | null;
+  sectionTitle?: string | null;
   text?: string | null;
 }
 
@@ -58,12 +66,17 @@ export interface RiskItem {
   recommendation?: string | null;
 }
 
+export interface QuestionEvidence {
+  chunkId?: number;
+  pageNumber?: number | null;
+  sectionTitle?: string | null;
+  text?: string | null;
+  content?: string | null;
+  score?: number | null;
+}
+
 export interface QuestionResponse {
   answer: string;
   confidence?: number | null;
-  evidence?: {
-    page?: number | null;
-    section?: string | null;
-    text?: string | null;
-  }[];
+  evidence?: QuestionEvidence[];
 }

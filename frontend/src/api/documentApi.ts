@@ -29,8 +29,12 @@ export const getContractExtraction = async (
 };
 
 export const getRisks = async (documentId: string): Promise<RiskItem[]> => {
-  const response = await axiosInstance.get(`/api/documents/${documentId}/risks`);
-  return response.data;
+  const response = await axiosInstance.get<{
+    documentId: string;
+    risks: RiskItem[];
+  }>(`/api/documents/${documentId}/risks`);
+
+  return response.data.risks;
 };
 
 export const askQuestion = async (

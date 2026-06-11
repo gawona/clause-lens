@@ -1,6 +1,8 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown"
 import { askQuestion } from "../../api/documentApi";
 import type { QuestionResponse } from "../../types/document";
+import MarkdownViewer from "../common/MarkdownViewr";
 
 interface QuestionBoxProps {
   documentId: string;
@@ -53,44 +55,64 @@ const QuestionBox = ({ documentId }: QuestionBoxProps) => {
       </div>
 
       {answer && (
-        <div className="mt-5 space-y-4">
+        <div className="mt-5 space-y-5">
           <div>
-            <p className="text-sm font-semibold text-gray-900">답변</p>
-            <p className="mt-2 text-sm leading-6 text-gray-700">
-              {answer.answer}
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-slate-900">답변</p>
+
+              {answer.confidence !== undefined && answer.confidence !== null && (
+                <span className="rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600">
+                  confidence {answer.confidence}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-2 rounded-xl bg-slate-50 p-5">
+              <MarkdownViewer content={answer.answer} />
+            </div>
           </div>
 
-          {answer.confidence !== undefined && answer.confidence !== null && (
-            <p className="text-sm text-gray-500">
-              confidence: {answer.confidence}
-            </p>
-          )}
-
           <div>
-            <p className="text-sm font-semibold text-gray-900">근거</p>
+            <p className="text-sm font-semibold text-slate-900">근거</p>
 
             {!answer.evidence || answer.evidence.length === 0 ? (
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-sm text-slate-500">
                 표시할 근거가 없습니다.
               </p>
             ) : (
-              <div className="mt-2 space-y-2">
-                {answer.evidence.map((evidence, index) => (
-                  <div
-                    key={`${evidence.page}-${index}`}
-                    className="rounded-lg bg-gray-50 p-3"
-                  >
-                    <p className="text-xs font-medium text-gray-500">
-                      {evidence.page ? `${evidence.page}p` : "페이지 없음"}
-                      {evidence.section ? ` · ${evidence.section}` : ""}
-                    </p>
+              <div className="mt-2 space-y-3">
+                {answer.evidence.map((evidence, index) => {
+                  const evidenceText = evidence.text || evidence.content || "";
 
-                    <p className="mt-2 text-sm leading-6 text-gray-700">
-                      {evidence.text || "-"}
-                    </p>
-                  </div>
-                ))}
+                  return (
+                    <div
+                      key={`${evidence.pageNumber}-${index}`}
+                      className="rounded-xl bg-slate-50 p-4"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-xs font-semibold text-slate-500">
+                          {evidence.pageNumber
+                            ? `${evidence.pageNumber}p`
+                            : "페이지 없음"}
+                          {evidence.sectionTitle
+                            ? ` · ${evidence.sectionTitle}`
+                            : ""}
+                        </p>
+
+                        {evidence.score !== undefined &&
+                          evidence.score !== null && (
+                            <span className="text-xs text-slate-400">
+                              score {evidence.score.toFixed(2)}
+                            </span>
+                          )}
+                      </div>
+
+                      <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-700">
+                        {evidenceText || "-"}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
