@@ -2,6 +2,7 @@ import type { AnalysisStatus } from "../types/document";
 
 export const isAnalysisRunningStatus = (status?: AnalysisStatus) => {
   return (
+    status === "REQUESTED" ||
     status === "ANALYZING" ||
     status === "EXTRACTING" ||
     status === "CHUNKING" ||
@@ -10,7 +11,11 @@ export const isAnalysisRunningStatus = (status?: AnalysisStatus) => {
 };
 
 export const canRunAnalysis = (status?: AnalysisStatus) => {
-  return status === "UPLOADED" || status === "FAILED";
+  return (
+    status === "NOT_STARTED" ||
+    status === "UPLOADED" ||
+    status === "FAILED"
+  );
 };
 
 export const getAnalysisButtonText = (

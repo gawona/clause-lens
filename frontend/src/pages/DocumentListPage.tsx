@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getDocuments } from "../api/documentApi";
+import DocumentUploadCard from "../components/document/DocumentUploadCard";
 import type { DocumentItem } from "../types/document";
 
 const getStatusClassName = (status?: string) => {
@@ -36,21 +37,21 @@ const formatFileSize = (fileSize: number) => {
 const DocumentListPage = () => {
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
+  const fetchDocuments = async () => {
+    try {
+      setIsLoading(true);
+      const result = await getDocuments();
+      setDocuments(result);
+    } catch (error) {
+      console.error("문서 목록 조회 실패:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   useEffect(() => {
-    const fetchDocuments = async () => {
-      try {
-        setIsLoading(true);
-        const result = await getDocuments();
-
-        console.log("문서 목록:", result);
-
-        setDocuments(result);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchDocuments();
   }, []);
 
@@ -68,6 +69,12 @@ const DocumentListPage = () => {
           문서 기반 질의응답을 확인할 수 있습니다.
         </p>
       </section>
+
+      <DocumentUploadCard
+        onUploaded={(uploadedDocument) => {
+          navigate(`/documents/${uploadedDocument.documentId}`);
+        }}
+      />
 
       <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">

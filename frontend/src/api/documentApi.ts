@@ -3,6 +3,7 @@ import type {
   ContractExtraction,
   DocumentDetail,
   DocumentItem,
+  DocumentType,
   QuestionResponse,
   RiskItem,
 } from "../types/document";
@@ -53,4 +54,23 @@ export const askQuestion = async (
 
 export const runAnalysis = async (documentId: string): Promise<void> => {
   await axiosInstance.post(`/api/documents/${documentId}/analysis/run`);
+};
+
+export const uploadDocument = async (request: {
+  documentName: string;
+  documentType: DocumentType;
+  file: File;
+}): Promise<DocumentItem> => {
+  const formData = new FormData();
+
+  formData.append("file", request.file);
+  formData.append("documentName", request.documentName);
+  formData.append("documentType", request.documentType);
+
+  const response = await axiosInstance.post<DocumentItem>(
+    "/api/documents",
+    formData
+  );
+
+  return response.data;
 };

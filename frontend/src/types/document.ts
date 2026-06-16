@@ -8,6 +8,8 @@ export type DocumentType =
 export type UploadStatus = "UPLOADED" | "FAILED";
 
 export type AnalysisStatus =
+  | "NOT_STARTED"
+  | "REQUESTED"
   | "UPLOADED"
   | "EXTRACTING"
   | "CHUNKING"
@@ -29,6 +31,12 @@ export interface DocumentItem {
 }
 
 export interface DocumentDetail extends DocumentItem {}
+
+export interface DocumentUploadRequest {
+  documentName: string;
+  documentType: DocumentType;
+  file: File;
+}
 
 export interface ExtractionEvidence {
   chunkId: number;
